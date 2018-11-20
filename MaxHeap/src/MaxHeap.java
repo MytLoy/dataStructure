@@ -60,8 +60,52 @@ public class MaxHeap<E extends Comparable<E>> {
         }
     }
 
+    // 查看堆中最大元素
+    public E findMax() {
+        if (data.getSize() == 0) {
+            throw new IllegalArgumentException("Can not findMax when heap is empty");
+        }
+        return data.get(0);
+    }
+
     // 向堆中取出元素
     // 只能取出最大元素（优先队列）- 堆顶
     // 删除堆顶元素 - 》将最后一个元素放到堆顶 -》与两个子节点进行比较
     // -》与两个孩子中最大的元素交换位置
+    public E extractMax() {
+        E ret = findMax();
+        // 交换位置
+        data.swap(0, data.getSize() - 1);
+        // 删除最后的一个元素 - 交换后的最大元素
+        data.removeLast();
+        // 下沉
+        siftDown(0);
+        return ret;
+    }
+
+    // 下沉
+    private void siftDown(int k) {
+        while (leftChild(k) < data.getSize()) {
+            // 找最大孩子节点
+            int j = leftChild(k);
+            // 存在右孩子,右孩子比较大
+            if (j + 1 < data.getSize() && data.get(j + 1).compareTo(data.get(j)) > 0) {
+                j = rightChild(k);
+            }
+            // data[j]是leftChild和rightChild中的最大值
+            if (data.get(k).compareTo(data.get(j)) > 0) {
+                break;
+            }
+            data.swap(k, j);
+            k = j; // 进行下一轮循环
+        }
+    }
+
+    // 取出堆中最大元素，并且替换成元素e
+    public E replace(E e) {
+        E ret = findMax();
+        data.set(0, e); // 堆顶替换
+        siftDown(0); // 以防违反堆的结构
+        return ret;
+    }
 }
