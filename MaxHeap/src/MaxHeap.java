@@ -17,6 +17,15 @@ public class MaxHeap<E extends Comparable<E>> {
         data = new Array<>();
     }
 
+    // heapify：将任意数组整理成堆的形状
+    // 找到最后一个非叶子节（最后一个节点的父亲节点），然后siftDown（所有非叶子节点）
+    public MaxHeap(E[] arr) {
+        data = new Array<>(arr);
+        for (int i = parent(arr.length - 1); i >= 0; i--) {
+            siftDown(i);
+        }
+    }
+
     // 返回堆中的元素个数
     public int size() {
         return data.getSize();
