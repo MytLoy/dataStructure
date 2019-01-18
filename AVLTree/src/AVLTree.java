@@ -1,3 +1,5 @@
+import java.util.ArrayList;
+
 /**
  * Created by Administrator on 2018/11/30 0030.
  * 记录每一个节点的高度，每一个节点的平衡因子
@@ -34,6 +36,45 @@ public class AVLTree<K extends Comparable<K>, V> {
         return size == 0;
     }
 
+    // 判断该二叉树是否是一颗二分搜索树  （中序便利时，是按照顺序排序的）
+    public boolean isBST() {
+        ArrayList<K> keys = new ArrayList<>();
+        inOrder(root, keys);
+        for (int i = 1; i < keys.size(); i++) {
+            if (keys.get(i - 1).compareTo(keys.get(i)) > 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // 中序遍历
+    private void inOrder(Node node, ArrayList<K> keys) {
+        if (node == null) {
+            return;
+        }
+        inOrder(node.left, keys);
+        keys.add(node.key);
+        inOrder(node.right, keys);
+    }
+
+    // 判断该二叉树是否是一颗平衡二叉树
+    public boolean isBalanced() {
+        return isBalanced(root);
+    }
+
+    // 判断以Node为根的二叉树是否是一颗平衡二叉树，递归算法
+    private boolean isBalanced(Node node) {
+        if (node == null) {
+            return true;
+        }
+        int balaceFactor = getBalanceFactor(node);
+        if (Math.abs(balaceFactor) > 1) {
+            return false;
+        }
+        return isBalanced(node.left) && isBalanced(node.right);
+    }
+
     // 获得节点node的高度
     private int getHeight(Node node){
         if(node == null)
@@ -51,6 +92,38 @@ public class AVLTree<K extends Comparable<K>, V> {
     // 向二分搜索树中添加新的元素(key, value)
     public void add(K key, V value){
         root = add(root, key, value);
+    }
+
+    // 对节点y进行向右旋转操作，返回旋转后新的根节点
+    private Node rightRotate(Node y) {
+        Node x = y.left;
+        Node T3 = x.right;
+
+        // 向右旋转过程
+        x.right = y;
+        y.left = T3;
+
+        // 更新height 只需更新x和y(因为高度是从叶子节点开始算起的)
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+
+        return x;
+    }
+
+    // 对节点y进行向左旋转操作，返回旋转后新的根节点
+    private  Node leftRotate(Node y) {
+        Node x = y.right;
+        Node T2 = x.left;
+
+        // 向右旋转过程
+        x.left = y;
+        y.right = T2;
+
+        // 更新height 只需更新x和y(因为高度是从叶子节点开始算起的)
+        y.height = Math.max(getHeight(y.left), getHeight(y.right)) + 1;
+        x.height = Math.max(getHeight(x.left), getHeight(x.right)) + 1;
+
+        return x;
     }
 
     // 向以node为根的二分搜索树中插入元素(key, value)，递归算法
@@ -76,6 +149,18 @@ public class AVLTree<K extends Comparable<K>, V> {
         int balanceFactor = getBalanceFactor(node);
         if(Math.abs(balanceFactor) > 1) // 绝对值
             System.out.println("unbalanced : " + balanceFactor);
+
+        // 平衡维护
+        // 注意：添加一个节点后才失去平衡
+        // 左侧不平衡 - 右旋转
+        if (balanceFactor > 1 && getBalanceFactor(node.left) >= 0) {
+            return rightRotate(node);
+        }
+
+        // 右侧不平衡 - 左旋转
+        if (balanceFactor < -1 && getBalanceFactor(node.right) <= 0) {
+            return leftRotate(node);
+        }
 
         return node;
     }
