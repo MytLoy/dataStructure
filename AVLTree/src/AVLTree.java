@@ -152,13 +152,25 @@ public class AVLTree<K extends Comparable<K>, V> {
 
         // 平衡维护
         // 注意：添加一个节点后才失去平衡
-        // 左侧不平衡 - 右旋转
+        // 左侧不平衡 - 右旋转 LL
         if (balanceFactor > 1 && getBalanceFactor(node.left) >= 0) {
             return rightRotate(node);
         }
 
-        // 右侧不平衡 - 左旋转
+        // 右侧不平衡 - 左旋转 RR
         if (balanceFactor < -1 && getBalanceFactor(node.right) <= 0) {
+            return leftRotate(node);
+        }
+
+        // LR (右孩子比左孩子高）
+        if (balanceFactor > 1 && getBalanceFactor(node.left) < 0) {
+            node.left = leftRotate(node.left);
+            return rightRotate(node);
+        }
+
+        // RL （左孩子比右孩子高）
+        if (balanceFactor < -1 && getBalanceFactor(node.right) > 0) {
+            node.right = rightRotate(node.right);
             return leftRotate(node);
         }
 
